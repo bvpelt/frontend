@@ -1,0 +1,26 @@
+{
+  "name": "frontend",
+  "homepage": "https://github.com/bvpelt/frontend",
+  "authors": [
+    "Bart van Pelt <bart.vanpelt@gmail.com>"
+  ],
+  "description": "Learning frontend development",
+  "main": "index.html",
+  "keywords": [
+    "learning",
+    "frontend",
+    "development"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "angularjs#^1.5.8"
+  }
+}
