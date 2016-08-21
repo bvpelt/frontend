@@ -6,7 +6,9 @@ In order to learn frontend development one just has to start!
 # References
 - [Frontend Development](http://weaintplastic.github.io/web-development-field-guide/Development/Frontend_Development/)
 - [Nodejs](https://nodejs.org/)
+- [Nodejs documentation](https://docs.npmjs.com/)
 - [Bower](https://bower.io/)
+- [npm-check](https://www.npmjs.com/package/npm-check)
 
 # Prerequisits
 Building and managing frontend applications is complicated because there are a lot of resources involved. The tooling used to do this consists of
@@ -37,35 +39,49 @@ Gulp is used to automate the build workflow for this project. Install gulp, usin
 
 # Project structure
 The default structure of the project will be
-```
+```   
     project
-    |
-    |-- source
-    |
-    |-- templates
-    |       |
-    |       |-- dist
-    |       |
-    |       `-- src
-    |
-    |-- bower.js
-    |-- gulpfile.js
-    |-- package.json
-    `-- README.md
+    ├-- bower.json
+    ├-- gulpfile.js
+    ├-- LICENSE
+    ├-- package.json
+    ├-- README.md
+    ├-- source
+    `-- templates
+        ├-- dist
+        |   `-- assets
+        |       ├-- css
+        |       ├-- fonts
+        |       ├-- img
+        |       `-- js
+        `-- src
+            `-- assets
+                ├-- fonts
+                ├-- img
+                ├-- js
+                `-- sass
+    
 ```
+
+
+- **bower.json** is the configuration file for your frontend dependencies managed with Bower
+- **gulpfile.js** is the description file for your build task runner based on Gulp
+- **LICENSE** the licence file for this application
+- **package.json** is the dependency description file for NodeJS packages
+- **README.md** this file
 - **source** holds the source files. This is the project's webroot containing all files that the project needs to be able to run. Usually this is where your server side system like a CMS or Web App is installed.
 - **templates** The templates folder is where you basically will work as a Frontend Developer. It contains just static files without any dependencies on a feature rich server side system like a Content Management System or Web Application Framework. Your templates folder is subdivided into two main folders: src and dist.
     - src folder holds all your frontend development files like LESS/SASS files, your structured Javascript, Fonts and Images and HTML and HTML partials
     - dist contains your compiled and minified CSS, your optimized Javascript and Images, your Fonts and your compiled HTML files.
-- **bower.js** is the configuration file for your frontend dependencies managed with Bower
-- **gulpfile.js** is the description file for your build task runner based on Gulp
-- **package.json** is the dependency description file for NodeJS packages
+
+
   
 
-Create the directories
+## Create the directories
 
 ```
-[bvpelt@pluto frontend]$ mkdir -p source templates/dist templates/src 
+[bvpelt@pluto frontend]$ mkdir -p source templates/dist templates/src templates/src/assets/js templates/src/assets/img templates/src/assets/sass templates/src/assets/fonts templates/dist/assets/css templates/dist/assets/js templates/dist/assets/fonts templates/dist/assets/img
+
 [bvpelt@pluto frontend]$
 ```
 
@@ -195,6 +211,8 @@ angular#1.5.8 bower_components/angular
 ```
 
 # Setup build system
+## Gulp
+Gulp is used to automate the building proces.
 
 ```
 [bvpelt@pluto frontend]$ npm install gulp --save
@@ -207,3 +225,181 @@ frontend@1.0.0 /home/bvpelt/Develop/frontend
 ... 
 [bvpelt@pluto frontend]$
 ```
+
+To fix there errors (specific for my environment) I used
+
+```
+[root@pluto ~]# npm update -g minimatch@3.0.2
+[root@pluto ~]# npm update -g lodash@4.0.0
+[root@pluto ~]# npm update -g gracefull-fs@4.0.0
+```
+
+## Add gulp dependencies
+```
+[bvpelt@pluto frontend]$ npm install gulp --save
+```
+
+The gulpfile.js is your task descriptor. It tells gulp which tasks it should perform on which files. This descriptor has to be created by hand. So go to your project root folder and create a file called gulpfile.js.
+ 
+```
+[bvpelt@pluto frontend]$ touch gulpfile.js
+[bvpelt@pluto frontend]$
+```
+
+Gulp itself can't do much for you. For all the hard work it needs the help of gulp plugins which cover the scope of a certain task you want to do. The functionality of plugins in combination will give you endless possibilities to setup the build script of your dreams. A full list of gulp plugins can be found [here](http://gulpjs.com/plugins/)
+
+A prerequisit is node-gyp which must be installed global
+
+```
+[root@pluto ~]# npm install -g node-gyp
+```
+
+Install the gulp-sass plugin
+
+```
+[bvpelt@pluto frontend]$ npm install gulp-sass --save
+frontend@1.0.0 /home/bvpelt/Develop/frontend
+└── gulp-sass@2.3.2 
+
+[bvpelt@pluto frontend]$ 
+```
+
+
+This buildscript usually serves as the initial setup when building a new build task for a new project. It is performing a lot of different tasks.
+
+- watches any source files for changes and executes the build process
+- compiles scss to css and injects vendor css (using gulp-inclue), auto prefixes the css and minfies it for prodction
+- concatinates and minifies js and generates sourcemaps
+- minifies images
+- concatinates html and php files (using gulp-inclue)
+- simply copy font files (this would be the perfect place to gzip your fonts)
+- notfies you with system dialogs whenever an error happens
+- sets up live-reload to work with the Chrome Livereload Extension
+
+
+```javascript
+var gulp               = require('gulp');             
+var fs                 = require('fs');
+var es                 = require('event-stream');
+var path               = require('path');
+var uglify             = require('gulp-uglify'); 
+var sass               = require('gulp-sass');
+var cssmin             = require('gulp-minify-css');
+var rename             = require('gulp-rename'); 
+var autoprefixer       = require('gulp-autoprefixer');
+var include            = require('gulp-include');
+var notify             = require("gulp-notify");
+var imagemin           = require("gulp-imagemin"); 
+var livereload         = require('gulp-livereload');
+var sourcemaps         = require('gulp-sourcemaps');
+
+var srcPath            = 'templates/src/';            // Path to the source files
+var distPath           = 'templates/dist/';            // Path to the distribution files
+
+// Paths that gulp should watch
+var watchPaths        = {
+    scripts:     [
+        srcPath+'assets/js/*.js',
+        srcPath+'assets/js/**/*.js'
+    ],
+    images:     [
+        srcPath+'assets/img/**'
+    ],
+    sass:         [
+        srcPath+'assets/sass/*.scss',
+        srcPath+'assets/sass/**/*.scss'
+    ],
+    fonts:      [
+        srcPath+'assets/fonts/**'
+    ],
+    html:          [
+        srcPath+'**/*.html',
+        srcPath+'**/*.php'
+    ]
+};
+
+// Task for sass files
+gulp.task('sass', function () {
+    gulp
+        .src(srcPath + 'assets/sass/styles.scss')
+        .pipe(include())
+        .pipe(sass())
+        .on("error", notify.onError({ message: "Error: <%= error.message %>", title: "Error running sass task" }))
+        .pipe(autoprefixer({ browsers: ['> 1%', 'last 2 versions'], cascade: false }))
+        .on("error", notify.onError({ message: "Error: <%= error.message %>", title: "Error running sass task" }))
+        .pipe(cssmin({ keepBreaks: false }))
+        .on("error", notify.onError({ message: "Error: <%= error.message %>", title: "Error running sass task" }))
+        .pipe(rename({ suffix: '.min' }))
+        .pipe(gulp.dest(distPath + 'assets/css'));
+});
+
+// Javscript task
+gulp.task('scripts', function(){
+    gulp
+        .src(srcPath + 'assets/js/*.js')
+        .pipe(include())
+        .pipe(sourcemaps.init())
+        .pipe(uglify())
+        .on("error", notify.onError({ message: "Error: <%= error.message %>", title: "Error running scripts task" }))
+        .pipe(rename({ suffix: '.min' }))
+        .pipe(sourcemaps.write('maps'))
+        .pipe(gulp.dest(distPath + 'assets/js'));
+});
+
+// Font task
+gulp.task('fonts', function () {
+    gulp
+        .src([srcPath + 'assets/fonts/**'])
+        .pipe(gulp.dest(distPath + 'assets/fonts'));
+});
+
+// HTML task
+gulp.task('html', function () {
+    gulp
+        .src([srcPath + '*.html'])
+        .pipe(include())
+        .on("error", notify.onError({ message: "Error: <%= error.message %>", title: "Error running html task" }))
+        .pipe(gulp.dest(distPath));
+});
+
+// Images task
+gulp.task('images', function () {
+    gulp
+        .src(srcPath + 'assets/img/**')
+        .pipe(imagemin())
+        .on("error", notify.onError({ message: "Error: <%= error.message %>", title: "Error running image task" }))
+        .pipe(gulp.dest(distPath + 'assets/img'));
+});
+
+// Watch task
+gulp.task('watch', function() {
+    gulp.watch(watchPaths.scripts, ['scripts']);
+    gulp.watch(watchPaths.images, ['images']);
+    gulp.watch(watchPaths.sass, ['sass']);
+    gulp.watch(watchPaths.html, ['html']);
+    gulp.watch(watchPaths.fonts, ['fonts']);
+
+    livereload.listen();
+    gulp.watch(distPath + '**').on('change', livereload.changed);
+});
+
+// Default task
+gulp.task('default', ['scripts', 'images', 'sass', 'fonts', 'html', 'watch']);
+```
+
+This gulp description will perform the default task upon execution of gulp in your command line. It will immediatley execute the sass task but also another important one – the watch task. This is a special kind of task that will watch changes to files in the given locations and executes the correspondent tasks. By setting up this task we can ensure, that our scssfile will be compiled everytime we modify it.
+
+```
+[bvpelt@pluto frontend]$ npm install event-stream --save
+[bvpelt@pluto frontend]$ npm install gulp-uglify --save
+[bvpelt@pluto frontend]$ npm install gulp-minify-css --save
+[bvpelt@pluto frontend]$ npm install gulp-rename --save
+[bvpelt@pluto frontend]$ npm install gulp-autoprefixer --save
+[bvpelt@pluto frontend]$ npm install gulp-include --save
+[bvpelt@pluto frontend]$ npm install gulp-notify --save
+[bvpelt@pluto frontend]$ npm install gulp-imagemin --save
+[bvpelt@pluto frontend]$ npm install gulp-livereload --save
+[bvpelt@pluto frontend]$ npm install gulp-sourcemaps --save
+```
+
+[upgrade nodejs on fedora](http://tecadmin.net/upgrade-nodejs-via-npm/#)
