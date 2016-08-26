@@ -1,0 +1,98 @@
+/* This comment is
+ * several lines long.
+ * since it uses the CSS comment syntax,
+ * it will appear in the CSS output. */
+
+$mobile-width: 500px;
+
+/* Grid layout */
+.gridbox {
+    margin-bottom: 0%;
+    margin-right: 0%;
+    float: left;
+}
+
+.gridcontainer {
+    width: 100%;
+}
+
+.gridheader {
+    width: 100%;
+}
+
+.gridmain {
+    width: 48%;
+}
+
+.gridmenu {
+    width: 23%;
+}
+
+.gridwrapper {
+    overflow: hidden;
+}
+
+/* Normal page layout */
+.footer {
+    padding: 1%;
+    text-align: center;
+    background-color: #f1f1f1;
+    border: 1px solid #e9e9e9;
+    font-size: 0.625em;
+}
+
+.header {
+    padding: 1%;
+    background-color: #f1f1f1;
+    border: 1px solid #e9e9e9;
+}
+
+.main {
+    padding: 2%;
+}
+
+.menuitem {
+    margin: 4%;
+    margin-left: 0;
+    margin-top: 0;
+    padding: 4%;
+    border-bottom: 1px solid #e9e9e9;
+    cursor: pointer;
+}
+
+.right {
+    padding: 4%;
+    background-color: #CDF0F6;
+}
+
+/* Mobile layout */
+@media only screen and (max-width: $mobile-width) {
+    /* grid layout */
+    .gridbox {
+        margin-right: 0;
+        float: left;
+    }
+
+    .gridmain {
+        width: 100%;
+    }
+
+    .gridmenu {
+            width: 100%;
+    }
+
+    /* mobile layout */
+    .main {
+        padding: 1%;
+    }
+
+   .menuitem {
+        margin: 1%;
+        padding: 1%;
+    }
+
+    .right {
+        padding: 1%;
+        background-color: #CDF0F6;
+    }
+}

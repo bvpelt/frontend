@@ -9,6 +9,11 @@ In order to learn frontend development one just has to start!
 - [Nodejs documentation](https://docs.npmjs.com/)
 - [Bower](https://bower.io/)
 - [npm-check](https://www.npmjs.com/package/npm-check)
+- [openlayers angularjs integration](https://medium.com/angularjs-meetup-south-london/angular-integration-with-openlayers-3-5a6e8d29e635#.rfzdxklmy) 
+- [pdok](https://media.readthedocs.org/pdf/pdok-ngr/latest/pdok-ngr.pdf)
+- [pdok en tms](http://pdok-ngr.readthedocs.io/publiceren.html#openlayers-3)
+- [pdok wmts example](https://gist.github.com/RaymondKroon/60f74ae45b2b67b79c45) 
+- [projection viewer](http://gis.ibbeck.de/ginfo/apps/OLExamples/ol311/MapProjectionViewer/projectionViewer.asp) 
 
 # Prerequisits
 Building and managing frontend applications is complicated because there are a lot of resources involved. The tooling used to do this consists of
@@ -80,7 +85,7 @@ The default structure of the project will be
 ## Create the directories
 
 ```
-[bvpelt@pluto frontend]$ mkdir -p source templates/dist templates/src templates/src/assets/js templates/src/assets/img templates/src/assets/sass templates/src/assets/fonts templates/dist/assets/css templates/dist/assets/js templates/dist/assets/fonts templates/dist/assets/img
+[bvpelt@pluto frontend]$ mkdir -p source templates/dist templates/src templates/src/assets/js templates/src/assets/img templates/src/assets/sass templates/src/assets/less templates/src/assets/fonts templates/dist/assets/css templates/dist/assets/js templates/dist/assets/fonts templates/dist/assets/img
 
 [bvpelt@pluto frontend]$
 ```
@@ -254,16 +259,7 @@ A prerequisit is node-gyp which must be installed global
 [root@pluto ~]# npm install -g node-gyp
 ```
 
-Install the gulp-sass plugin
-
-```
-[bvpelt@pluto frontend]$ npm install gulp-sass --save
-frontend@1.0.0 /home/bvpelt/Develop/frontend
-└── gulp-sass@2.3.2 
-
-[bvpelt@pluto frontend]$ 
-```
-
+Create a buildscript
 
 This buildscript usually serves as the initial setup when building a new build task for a new project. It is performing a lot of different tasks.
 
@@ -388,11 +384,15 @@ gulp.task('default', ['scripts', 'images', 'sass', 'fonts', 'html', 'watch']);
 ```
 
 This gulp description will perform the default task upon execution of gulp in your command line. It will immediatley execute the sass task but also another important one – the watch task. This is a special kind of task that will watch changes to files in the given locations and executes the correspondent tasks. By setting up this task we can ensure, that our scssfile will be compiled everytime we modify it.
+[Automatic deployement](http://mikeeverhart.net/2016/01/deploy-code-to-remote-servers-with-gulp-js/) 
+Install gulp plugins:
 
 ```
 [bvpelt@pluto frontend]$ npm install event-stream --save
 [bvpelt@pluto frontend]$ npm install gulp-uglify --save
 [bvpelt@pluto frontend]$ npm install gulp-minify-css --save
+[bvpelt@pluto frontend]$ npm install gulp-sass --save
+[bvpelt@pluto frontend]$ npm install gulp-less --save
 [bvpelt@pluto frontend]$ npm install gulp-rename --save
 [bvpelt@pluto frontend]$ npm install gulp-autoprefixer --save
 [bvpelt@pluto frontend]$ npm install gulp-include --save
@@ -403,3 +403,7 @@ This gulp description will perform the default task upon execution of gulp in yo
 ```
 
 [upgrade nodejs on fedora](http://tecadmin.net/upgrade-nodejs-via-npm/#)
+
+```
+[bvpelt@pluto frontend]$ bower install OpenLayers --save
+```

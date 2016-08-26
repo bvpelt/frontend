@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+   <!--
+    <link rel="stylesheet" type="text/css" href="assets/css/bootstrap.min.css">
+    -->
+    <link rel="stylesheet" type="text/css" href="assets/css/ol.min.css" >
+    <link rel="stylesheet" type="text/css" href="assets/css/frontend.min.css">
+
+    <script src="assets/js/ol.js" type="text/javascript"></script>
+    <title>PDOK Example</title>
+
+</head>
+<body>
+<div class="container">
+
+    <div id="map">
+    </div>
+
+    <script type="text/javascript">
+        var extent = [-285401.92,22598.08,595401.9199999999,903401.9199999999];
+        var resolutions = [3440.640, 1720.320, 860.160, 430.080, 215.040, 107.520, 53.760, 26.880, 13.440, 6.720, 3.360, 1.680, 0.840, 0.420];
+
+       // proj4.defs["EPSG:28992"] = "+proj=sterea +lat_0=52.15616055555555 +lon_0=5.38763888888889 +k=0.9999079 +x_0=155000 +y_0=463000 +ellps=bessel +units=m +no_defs";
+
+        var projection = new ol.proj.Projection({code:'EPSG:28992', units:'m', extent: extent});
+
+
+        // default zoom, center and rotation
+        var zoom = 4;
+        var center = [150000, 450000];
+        var rotation = 0;
+
+        var url = 'http://geodata.nationaalgeoregister.nl/tms/1.0.0/brtachtergrondkaart/';
+        //var url = 'http://geodata.nationaalgeoregister.nl/tms/1.0.0/opentopoachtergrondkaart/';
+
+        var tileUrlFunction = function(tileCoord, pixelRatio, projection) {
+            var zxy = tileCoord;
+            if (zxy[1] < 0 || zxy[2] < 0) {
+                return "";
+            }
+            return url +
+                zxy[0].toString()+'/'+ zxy[1].toString() +'/'+
+                zxy[2].toString() +'.png';
+        };
+
+        if (window.location.hash !== '') {
+            // try to restore center, zoom-level and rotation from the URL
+            var hash = window.location.hash.replace('#map=', '');
+            var parts = hash.split('/');
+            if (parts.length === 4) {
+                zoom = parseInt(parts[0], 10);
+                center = [
+                    parseFloat(parts[1]),
+                    parseFloat(parts[2])
+                ];
+                rotation = parseFloat(parts[3]);
+            }
+        };
+
+        var scaleLineControl = new ol.control.ScaleLine();
+        scaleLineControl.setUnits("metric");
+
+        var map = new ol.Map({
+            controls: ol.control.defaults({
+                attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
+                collapsible: false })
+            }).extend([
+                new ol.control.FullScreen(),
+                scaleLineControl
+            ]),
+            layers:  [
+                new ol.layer.Tile({
+                    source: new ol.source.TileImage({
+                    projection: projection,
+                    tileGrid: new ol.tilegrid.TileGrid({
+                        origin: [-285401.92,22598.08],
+                        resolutions: resolutions
+                    }),
+                    tileUrlFunction: tileUrlFunction
+                })
+            }),
+            ],
+            target: 'map',
+            view: new ol.View({
+                minZoom: 4,
+                maxZoom: 13,
+                projection: projection,
+                center: center,
+                rotation: rotation,
+                zoom: zoom
+            })
+        });
+
+        var shouldUpdate = true;
+        var view = map.getView();
+        var updatePermalink = function() {
+            if (!shouldUpdate) {
+                // do not update the URL when the view was changed in the 'popstate' handler
+                shouldUpdate = true;
+                return;
+            }
+
+            var center = view.getCenter();
+            var hash = '#map=' +
+                view.getZoom() + '/' +
+                Math.round(center[0] * 100) / 100 + '/' +
+                Math.round(center[1] * 100) / 100 + '/' +
+                view.getRotation();
+            var state = {
+                zoom: view.getZoom(),
+                center: view.getCenter(),
+                rotation: view.getRotation()
+            };
+            window.history.pushState(state, 'map', hash);
+        };
+
+        map.on('moveend', updatePermalink);
+
+        // restore the view state when navigating through the history, see
+        // https://developer.mozilla.org/en-US/docs/Web/API/WindowEventHandlers/onpopstate
+        window.addEventListener('popstate', function(event) {
+            if (event.state === null) {
+                return;
+            }
+            map.getView().setCenter(event.state.center);
+            map.getView().setZoom(event.state.zoom);
+            map.getView().setRotation(event.state.rotation);
+            shouldUpdate = false;
+        });
+
+        document.getElementById('zoom-out').onclick = function() {
+            var view = map.getView();
+            var zoom = view.getZoom();
+            view.setZoom(zoom - 1);
+        };
+
+        document.getElementById('zoom-in').onclick = function() {
+            var view = map.getView();
+            var zoom = view.getZoom();
+            view.setZoom(zoom + 1);
+        };
+
+    </script>
+</div>
+</body>
+</html>
