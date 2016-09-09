@@ -25,7 +25,7 @@ Building and managing frontend applications is complicated because there are a l
 See [Nodejs](https://nodejs.org/en/) for a description howto install nodejs on the environment.
 
 ## Bower
-Bower is used to manage dependencies between all packages used in the project. Install bower, using an account with sufficient privileges. 
+Bower is used to manage dependencies between all packages used in the project. Install bower, using an account with sufficient privileges. This only has to be done once to setup the developer environment on a specific system. Once bower is installed globally every user can use it.
 
 ```
 [root@pluto ~]# npm install -g bower
@@ -36,7 +36,7 @@ Bower is used to manage dependencies between all packages used in the project. I
 ```
 
 ## Gulp
-Gulp is used to automate the build workflow for this project. Install gulp, using an account with sufficient privileges.
+Gulp is used to automate the build workflow for this project. Install gulp, using an account with sufficient privileges. This only has to be done once to setup the developer environment on a specific system. Once gulp is installed globally every user can use it.
 
 ```
 [root@pluto ~]# npm install --global gulp
@@ -85,8 +85,35 @@ The default structure of the project will be
 ## Create the directories
 
 ```
-[bvpelt@pluto frontend]$ mkdir -p source templates/dist templates/src templates/src/assets/js templates/src/assets/img templates/src/assets/sass templates/src/assets/less templates/src/assets/fonts templates/dist/assets/css templates/dist/assets/js templates/dist/assets/fonts templates/dist/assets/img
+[bvpelt@pluto frontend]$ mkdir -p templates/src/assets/{fonts,img,js,sass}
+[bvpelt@pluto ngviewer]$ mkdir -p templates/dist/assets/{css,fonts,img,js}
+[bvpelt@pluto frontend]$ cat > LICENSE << EOF
+MIT License
 
+Copyright (c) 2016 Bart van Pelt
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+EOF
+[bvpelt@pluto frontend]$ cat > README.md <<EOF
+# Readme
+...
+EOF
 [bvpelt@pluto frontend]$
 ```
 

@@ -63,6 +63,35 @@
         var scaleLineControl = new ol.control.ScaleLine();
         scaleLineControl.setUnits("metric");
 
+        var background = new ol.layer.Tile({
+                            source: new ol.source.TileImage({
+                                projection: projection,
+                                tileGrid: new ol.tilegrid.TileGrid({
+                                    origin: [-285401.92,22598.08],
+                                    resolutions: resolutions
+                                }),
+                                tileUrlFunction: tileUrlFunction
+                            })
+                         });
+
+        var vector = new ol.layer.Vector({
+                        source: new ol.source.Vector({
+                            format: new ol.format.GeoJSON(),
+                            url: function(extent, resolution, projection) {
+                                return 'https://geodata.nationaalgeoregister.nl/bag/wfs?service=WFS&' +
+                                    'version=2.0.0&request=GetFeature&typename=bag:pand&' +
+                                    'outputFormat=application/json&srsname=EPSG:28992&' +
+                                    'bbox=' + extent.join(',');
+                            },
+                            strategy: ol.loadingstrategy.tile(ol.tilegrid.createXYZ({
+                                minZoom: 11,
+                                maxZoom: 13
+                            }))
+                        })
+                    });
+
+                    //https://geodata.nationaalgeoregister.nl/bag/wfs?service=WFS&version=1.1.0&request=GetFeature&typename=bag:pand&outputFormat=application/json&srsname=EPSG:28992&bbox=165069,448186,165053,448134
+
         var map = new ol.Map({
             controls: ol.control.defaults({
                 attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
@@ -71,18 +100,7 @@
                 new ol.control.FullScreen(),
                 scaleLineControl
             ]),
-            layers:  [
-                new ol.layer.Tile({
-                    source: new ol.source.TileImage({
-                    projection: projection,
-                    tileGrid: new ol.tilegrid.TileGrid({
-                        origin: [-285401.92,22598.08],
-                        resolutions: resolutions
-                    }),
-                    tileUrlFunction: tileUrlFunction
-                })
-            }),
-            ],
+            layers:  [ background, vector ],
             target: 'map',
             view: new ol.View({
                 minZoom: 4,
